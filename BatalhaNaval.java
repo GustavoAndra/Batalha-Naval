@@ -1,7 +1,5 @@
-
 import java.util.Random;
 import java.util.Scanner;
-
 public class BatalhaNaval 
 {
     private static final int TAMANHO_MAPA = 10;
@@ -12,14 +10,13 @@ public class BatalhaNaval
     private static final char VAZIO = '?';
     private static final char ATINGIDO = 'X';
     private static final char ERRO = 'O';
+   private static final char BARCO = 'B';
     private final char[][][] mapas;
-  private char[][][] mapasAtaques;
     private final int[] pontuacoes;
     
     public BatalhaNaval(){
     mapas = new char[NUMERO_JOGADORES][TAMANHO_MAPA][TAMANHO_MAPA];
     pontuacoes = new int[NUMERO_JOGADORES];
-    mapasAtaques = new char[NUMERO_JOGADORES][TAMANHO_MAPA][TAMANHO_MAPA];
     inicializarMapas();
 }
     public void jogar() {
@@ -110,7 +107,7 @@ public class BatalhaNaval
 }
 
     
-private void exibirMapa(int jogador) {
+private void exibirMapa(int jogador, boolean exibirBarcos) {
     System.out.println("\n    A B C D E F G H I J");
 
     for (int i = 0; i < TAMANHO_MAPA; i++) {
@@ -119,15 +116,19 @@ private void exibirMapa(int jogador) {
         for (int j = 0; j < TAMANHO_MAPA; j++) {
             char c = mapas[jogador][i][j];
 
-            if (c == 'X' || c == 'B' || c == ATINGIDO || c == VAZIO || c == ERRO) {
+            if (c == 'X' || c == ATINGIDO || c == VAZIO || c == ERRO) {
+                System.out.print(c + " ");
+            } else if (exibirBarcos && c == BARCO) {
                 System.out.print(c + " ");
             } else {
-                System.out.print("~ "); // Caractere para representar uma posição não revelada
+                System.out.print("? "); // Caractere para representar uma posição não revelada
             }
         }
         System.out.println();
     }
 }
+
+
 
 private void exibirMapaAtaques(int oponente) {
     System.out.println("\n    A B C D E F G H I J");
@@ -183,7 +184,8 @@ private void exibirMapaAtaques(int oponente) {
     }
  private void posicionarBarcosManualmente(int jogador, Scanner scanner) {
     for (int i = 0; i < TAMANHO_BARCOS.length; i++) {
-        exibirMapa(jogador);
+        exibirMapa(jogador, true);
+ // Mostra o mapa atualizado antes de cada posicionamento de barco
         System.out.println("Posicione o " + NOMES_BARCOS[i] + " (" + TAMANHO_BARCOS[i] + " espaços):");
 
         boolean posicaoValida = false;
@@ -289,13 +291,16 @@ private void exibirMapaAtaques(int oponente) {
     
 private void realizarAtaque(int jogador, int oponente, Scanner scanner) {
     boolean jogadaValida = false;
-    System.out.println("\nMapa do Jogador " + (jogador + 1) + ":");
-    exibirMapa(jogador);
+    System.out.println("\nSeu Mapa");
+   exibirMapa(jogador, false);
 
-    System.out.println("\nMapa do Adversário " + (oponente + 1) + ":");
+
+    System.out.println("\nMapa do Adversário ");
     exibirMapaAtaques(oponente);
-
+ System.out.print("\nPressione Enter para continuar...");
+            scanner.nextLine(); // Aguarda a entrada do usuário
     while (!jogadaValida) {
+       
         System.out.print("\nDigite a linha (0-9) para atacar: ");
         int linha;
         while (true) {
@@ -344,19 +349,24 @@ private void realizarAtaque(int jogador, int oponente, Scanner scanner) {
                 System.out.println("Acertou um barco!");
                 mapas[oponente][linha][coluna] = ATINGIDO;
                 pontuacoes[jogador]++;
-                if (pontuacoes[jogador] == TOTAL_BARCOS) {
+                if (pontuacoes[jogador] == TOTAL_BARCOS)
+                 {
                     System.out.println("Parabéns! Você afundou todos os barcos do adversário!");
-                } else if (pontuacoes[jogador] == 1) {
+                } 
+                else if (pontuacoes[jogador] == 1)
+                {
                     System.out.println("Parabéns! Você afundou um barco do adversário!");
                 }
                 jogadaValida = true;
                 break;
         }
+         
 
         if (verificarFimDeJogo(oponente)) {
             System.out.println("Todos os barcos do adversário foram afundados! Você venceu o jogo!");
             jogadaValida = true;
         }
+      
     }
 }
 
@@ -383,13 +393,16 @@ private void realizarAtaqueMaquina(int jogador, int oponente) {
                 System.out.println("\nA máquina atacou a posição " + (char) ('A' + coluna) + linha + ": Acertou um barco");
                 mapas[oponente][linha][coluna] = ATINGIDO;
                 pontuacoes[jogador]++;
-                if (pontuacoes[jogador] == TOTAL_BARCOS) {
+
+                if (pontuacoes[jogador] == TOTAL_BARCOS)
+                 {
                     System.out.println("A máquina afundou todos os seus barcos!");
-                } else if (pontuacoes[jogador] == 1) {
+                } 
+                else if (pontuacoes[jogador] == 1)
+                 {
                     System.out.println("A máquina afundou um dos seus barcos!");
                 }
-                jogadaValida = true;
-                break;
+
         }
 
         if (verificarFimDeJogo(oponente)) {
